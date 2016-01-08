@@ -1,5 +1,6 @@
 from .dbase import DerivedBase
 from .base import Property
+from .job import Job
 
 class Disk(DerivedBase):
     api_endpoint = '/linodes/{linode_id}/disks/{id}'
@@ -50,3 +51,16 @@ class Disk(DerivedBase):
         if not root_password:
             return True, rpass
         return True
+
+    def resize(self, new_size):
+        result = self._client.post("{}/resize".format(Disk.api_endpoint), model=self, data={
+            'size': new_size,
+        })
+
+        if not 'job' in result:
+            return result
+
+        # TODO - make sure this works
+        j  = Job(self._client, result['job']['id'], self.linode_id)
+        j._populate(result['job'])
+        return j
