@@ -74,7 +74,7 @@ class Linode(Base):
         return c
 
     def create_disk(self, size, label=None, filesystem=None, read_only=False, distribution=None, \
-            root_pass=None, root_key=None, stackscript=None, **stackscript_args):
+            root_pass=None, root_ssh_key=None, stackscript=None, **stackscript_args):
 
         gen_pass = None
         if distribution and not root_pass:
@@ -84,6 +84,14 @@ class Linode(Base):
 
         if distribution and not label:
             label = "My {} Disk".format(distribution.label)
+
+        if distribution and root_ssh_key:
+            accepted_key_types = ("ssh-rsa","ssh-dds", "ecdsa-sha2-nistp", "ssh-ed25519")
+            if not any([ c for c in accepted_key_types if root_ssh_key.startswith(c) ]):
+                import os
+                if os.path.isfile(root_ssh_key):
+                    with open(root_ssh_key) as f:
+                        root_ssh_key = f.read()
 
         params = {
             'size': size,
@@ -97,6 +105,11 @@ class Linode(Base):
                 'distribution': distribution.id,
                 'root_pass': root_pass,
             })
+
+            if root_ssh_key:
+                params.update({
+                    'root_ssh_key': root_ssh_key,
+                })
 
         if stackscript:
             params['stackscript'] = stackscript.id
