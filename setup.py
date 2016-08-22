@@ -79,5 +79,7 @@ setup(
         "future",
         "requests",
         "enum34",
-    ]
+    ],
+
+    test_suite="tests"
 )
