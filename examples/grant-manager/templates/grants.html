@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href='/logout'>Logout</a> <br/>
+<h1>Grants Manager</h1>
+<p>Use this to manage grants for your restricted users.</p>
+<b>Unrestricted Users:</b><br/>
+{% for u in unrestricted_users %}
+    <a href="/users/{{ u.username }}">{{ u.username }}</a><br/>
+{% endfor %}
+<br/>
+<div>
+    <b>Global</b>
+    <div class='row header-row'>
+        <span class='col-md-2'>Username</span>
+        <span class='col-md-1'>Add Linodes</span>
+        <span class='col-md-1'>Add DNS Zones</span>
+        <span class='col-md-1'>Add NodeBalancers</span>
+        <span class='col-md-1'>Add StackScripts</span>
+        <span class='col-md-1'>Add Longview</span>
+        <span class='col-md-1'>Longview Subscription</span>
+    </div>
+    {% for u in restricted_users %}
+        <div class='row' style='margin-bottom: 0'>
+            <span class='col-md-2'>
+                <a href="/users/{{ u.username }}">{{u.username}}</a>
+            </span>
+            <span class='col-md-1'><input type="checkbox" {% if u.grants.global_grants.add_linodes %}checked{% endif %}></span>
+            <span class='col-md-1'><input type="checkbox" {% if u.grants.global_grants.add_dnszones %}checked{% endif %}></span>
+            <span class='col-md-1'><input type="checkbox" {% if u.grants.global_grants.add_nodebalancers %}checked{% endif %}></span>
+            <span class='col-md-1'><input type="checkbox" {% if u.grants.global_grants.add_stackscripts %}checked{% endif %}></span>
+            <span class='col-md-1'><input type="checkbox" {% if u.grants.global_grants.add_longview %}checked{% endif %}></span>
+            <span class='col-md-1'><input type="checkbox" {% if u.grants.global_grants.longview_subscription %}checked{% endif %}></span>
+        </div>
+    {% endfor %}
+    <br/>
+    <b>Customer</b>
+    <div class='row header-row'>
+        <span class='col-md-2'>Username</span>
+        <span class='col-md-1'>Access</span>
+        <span class='col-md-1'>Delete</span>
+    </div>
+    {% for u in restricted_users %}
+        <div class='row' style='margin-bottom: 0'>
+            <span class='col-md-2'>
+                <a href="/users/{{ u.username }}">{{u.username}}</a>
+            </span>
+            <span class='col-md-1'><input type="checkbox" {% if u.grants.customer.access %}checked{% endif %}></span>
+            <span class='col-md-1'><input type="checkbox" {% if u.grants.customer.delete %}checked{% endif %}></span>
+        </div>
+    {% endfor %}
+    <br/>
+    <b>Linodes</b>
+    <div class='row header-row'>
+        <span class='col-md-2'>Username</span>
+        <span class='col-md-1'>All</span>
+        <span class='col-md-1'>Access</span>
+        <span class='col-md-1'>Resize</span>
+        <span class='col-md-1'>Delete</span>
+    </div>
+    {% for lid, grants in linode_grants.items() %}
+        <div class='row subheader-row'>
+            <span class='col-md-12'>
+                <b><a href="#lid">{{ grants[0][1].label }}</a></b>
+            </span>
+        </div>
+        {% for u, g in grants %}
+            <div class='row' style="margin-bottom: 0">
+                <span class='col-md-2'>{{ u.username }}</span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.access %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.resize %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.delete %}checked{% endif %}></span>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <br/>
+    <b>DNS</b>
+    <div class='row header-row'>
+        <span class='col-md-2'>Username</span>
+        <span class='col-md-1'>All</span>
+        <span class='col-md-1'>Access</span>
+        <span class='col-md-1'>Delete</span>
+    </div>
+    {% for lid, grants in dnszone_grants.items() %}
+        <div class='row subheader-row'>
+            <span class='col-md-12'>
+                <b><a href="#lid">{{ grants[0][1].label }}</a></b>
+            </span>
+        </div>
+        {% for u, g in grants %}
+            <div class='row' style="margin-bottom: 0">
+                <span class='col-md-2'>{{ u.username }}</span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.access %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.delete %}checked{% endif %}></span>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <br/>
+    <b>StackScript</b>
+    <div class='row header-row'>
+        <span class='col-md-2'>Username</span>
+        <span class='col-md-1'>All</span>
+        <span class='col-md-1'>Use</span>
+        <span class='col-md-1'>Edit</span>
+        <span class='col-md-1'>Delete</span>
+    </div>
+    {% for lid, grants in stackscript_grants.items() %}
+        <div class='row subheader-row'>
+            <span class='col-md-12'>
+                <b><a href="#lid">{{ grants[0][1].label }}</a></b>
+            </span>
+        </div>
+        {% for u, g in grants %}
+            <div class='row' style="margin-bottom: 0">
+                <span class='col-md-2'>{{ u.username }}</span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.use %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.edit %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.delete %}checked{% endif %}></span>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {#
+    <br/>
+    <b>NodeBalancer</b>
+    <div class='row header-row'>
+        <span class='col-md-2'>Username</span>
+        <span class='col-md-1'>All</span>
+        <span class='col-md-1'>Access</span>
+        <span class='col-md-1'>Delete</span>
+    </div>
+    {% for lid, grants in nodebalancer_grants.items() %}
+        <div class='row subheader-row'>
+            <span class='col-md-12'>
+                <b><a href="#lid">{{ grants[0][1].label }}</a></b>
+            </span>
+        </div>
+        {% for u, g in grants %}
+            <div class='row' style="margin-bottom: 0">
+                <span class='col-md-2'>{{ u.username }}</span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.use %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.edit %}checked{% endif %}></span>
+                <span class='col-md-1'><input type="checkbox" {% if g.all or g.delete %}checked{% endif %}></span>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    #}
+</div>
+
+{% endblock %}
